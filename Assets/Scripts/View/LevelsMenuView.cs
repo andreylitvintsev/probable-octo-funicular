@@ -1,3 +1,4 @@
+using ReactiveProperty;
 using Service;
 using TMPro;
 using UnityEngine;
@@ -5,35 +6,33 @@ using UnityEngine.UI;
 
 namespace View
 {
-    public class LevelsMenuView : MonoBehaviour
+    public class LevelsMenuView : AbstractView<SceneLoaderService.MenuSceneLaunchOptions>
     {
         [SerializeField] private Button _buttonPrefab = null;
         [SerializeField] private Transform _buttonContainer = null;
         
-        private SceneLoaderService.MenuSceneLaunchOptions _launchOptions;
-        
-        public void Initialize(SceneLoaderService.MenuSceneLaunchOptions launchOptions)
+        protected override void OnInitialize(SceneLoaderService.MenuSceneLaunchOptions data)
         {
-            _launchOptions = launchOptions;
-
-            var gameLevelsService = _launchOptions.ServiceProvider.GetService<GameLevelsService>();
-            var sceneLoaderService = _launchOptions.ServiceProvider.GetService<SceneLoaderService>();
+            var gameLevelsService = Data.ServiceProvider.GetService<GameLevelsService>();
+            var sceneLoaderService = Data.ServiceProvider.GetService<SceneLoaderService>();
             
             foreach (var gameLevelSettings in gameLevelsService.LevelSettings)
             {
                 var button = Instantiate(_buttonPrefab, _buttonContainer);
                 button.GetComponentInChildren<TMP_Text>().text = gameLevelSettings.Name;
-                button.onClick.AddListener(() =>
+                button.SubscribeOnClick(() =>
                 {
                     sceneLoaderService.Launch(new SceneLoaderService.GameSceneLaunchOptions 
                     {
-                        ServiceProvider = _launchOptions.ServiceProvider,
+                        ServiceProvider = Data.ServiceProvider,
                         GameLevelSettings = gameLevelSettings,
                     });
-                });
+                }).DisposeWith(this);
             }
 
             _buttonPrefab.gameObject.SetActive(false);
         }
+
+        protected override void OnDeinitialize() {}
     }
 }
