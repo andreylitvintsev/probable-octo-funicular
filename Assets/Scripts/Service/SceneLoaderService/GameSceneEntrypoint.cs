@@ -1,9 +1,15 @@
 using UnityEngine;
+using View;
 
 namespace Service
 {
     public class GameSceneEntrypoint : MonoBehaviour
     {
-        public void Initialize(SceneLoaderService.GameSceneLaunchOptions launchOptions) {}
+        [SerializeField] private GameLevelView _gameLevelView = null;
+        
+        public void Initialize(SceneLoaderService.GameSceneLaunchOptions launchOptions)
+        {
+            _gameLevelView.Initialize(launchOptions);
+        }
     }
 }
