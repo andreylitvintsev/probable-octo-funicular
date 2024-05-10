@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Service;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +13,8 @@ namespace View
         [SerializeField] private GridLayoutGroup _gridLayout;
         
         private GameLogicService _gameLogicService = null;
+        
+        private Queue<CardView> _touchedCardQueue = new();
         
         protected override void OnInitialize(SceneLoaderService.GameSceneLaunchOptions data)
         {
@@ -34,6 +38,42 @@ namespace View
         protected override void OnDeinitialize()
         {
             _gameLogicService.FinishGame();
+        }
+        
+        public void OnCardViewTouched(CardView cardView)
+        {
+            _touchedCardQueue.Enqueue(cardView);
+        }
+        
+        public void OnCheckMatch()
+        {
+            while (_touchedCardQueue.Count >= 2)
+            {
+                if (_touchedCardQueue.Take(2).Any((cardView) => cardView.IsAnimated))
+                    return;
+
+                var cardView1 = _touchedCardQueue.Dequeue();
+                var cardView2 = _touchedCardQueue.Dequeue();
+
+                if (cardView1.Data.Symbol == cardView2.Data.Symbol)
+                    OnMatch(cardView1, cardView2);
+                else
+                    OnMissMatch(cardView1, cardView2);
+            }
+        }
+        
+        private void OnMatch(CardView cardView1, CardView cardView2)
+        {
+            Debug.Log("On Match");
+            cardView1.OnMatch();
+            cardView2.OnMatch();
+        }
+
+        private void OnMissMatch(CardView cardView1, CardView cardView2)
+        {
+            Debug.Log("On MissMatch");
+            cardView1.OnMissMatch();
+            cardView2.OnMissMatch();
         }
     }
 }

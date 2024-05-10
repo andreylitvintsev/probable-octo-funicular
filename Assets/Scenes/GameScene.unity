@@ -180,6 +180,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _flipText: {fileID: 1135339513}
   _button: {fileID: 227025860}
+  _gameLevelView: {fileID: 661998992}
   _playableDirector: {fileID: 227025862}
   _cardFlipToBackTimeline: {fileID: 11400000, guid: 5e4162d48bd4546239fd2e9b3b887045, type: 2}
   _cardFlipToFrontTimeline: {fileID: 11400000, guid: 2a565619c47914866a494ae2f8880af9, type: 2}
