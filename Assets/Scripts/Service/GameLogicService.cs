@@ -1,4 +1,4 @@
-using System;
+using System.Linq;
 using Random = UnityEngine.Random;
 
 namespace Service
@@ -12,15 +12,27 @@ namespace Service
             private int _symbol = 0;
             public int Symbol => _symbol;
 
+            private bool _isMatched = false;
+            public bool IsMatched => _isMatched;
+
             public Card(GameLogicService gameLogicService, int symbol)
             {
                 _gameLogicService = gameLogicService;
                 _symbol = symbol;
             }
+
+            public void MarkAsMatched()
+            {
+                _isMatched = true;
+            }
         }
         
         private GameLevelsService.GameLevelSettings? _gameLevelSettings = null;
         private Card[] _cards = null;
+
+        public bool IsFinished => _gameLevelSettings == null ||
+                                  _cards == null ||
+                                  _cards.All(card => card.IsMatched);
 
         public override void Initialize() {}
 

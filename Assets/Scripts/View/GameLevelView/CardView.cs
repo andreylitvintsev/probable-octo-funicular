@@ -75,7 +75,7 @@ namespace View
         
         public void OnMatch()
         {
-            
+            Data.MarkAsMatched();
         }
 
         public void OnMissMatch()

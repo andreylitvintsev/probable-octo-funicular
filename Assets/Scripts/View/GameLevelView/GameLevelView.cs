@@ -11,14 +11,19 @@ namespace View
         [SerializeField] private CardView _cardViewPrefab = null;
         [SerializeField] private Transform _cardsViewContainer = null;
         [SerializeField] private GridLayoutGroup _gridLayout;
-        
+
+        private ServiceProvider _serviceProvider = null;
         private GameLogicService _gameLogicService = null;
+        private SceneLoaderService _sceneLoaderService = null;
         
         private Queue<CardView> _touchedCardQueue = new();
         
         protected override void OnInitialize(SceneLoaderService.GameSceneLaunchOptions data)
         {
+            _serviceProvider = data.ServiceProvider;
             _gameLogicService = data.ServiceProvider.GetService<GameLogicService>();
+            _sceneLoaderService = data.ServiceProvider.GetService<SceneLoaderService>();
+            
             _gameLogicService.StartGame(data.GameLevelSettings);
             
             for (int col = 0; col < data.GameLevelSettings.ColumnsNumber; ++col)
@@ -67,6 +72,14 @@ namespace View
             Debug.Log("On Match");
             cardView1.OnMatch();
             cardView2.OnMatch();
+
+            if (_gameLogicService.IsFinished)
+            {
+                _sceneLoaderService.Launch(new SceneLoaderService.MenuSceneLaunchOptions
+                {
+                    ServiceProvider = _serviceProvider,
+                });
+            }
         }
 
         private void OnMissMatch(CardView cardView1, CardView cardView2)
