@@ -15,6 +15,7 @@ namespace View
         private ServiceProvider _serviceProvider = null;
         private GameLogicService _gameLogicService = null;
         private SceneLoaderService _sceneLoaderService = null;
+        private SoundsPlayerService _soundsPlayerService = null;
         
         private Queue<CardView> _touchedCardQueue = new();
         
@@ -23,6 +24,7 @@ namespace View
             _serviceProvider = data.ServiceProvider;
             _gameLogicService = data.ServiceProvider.GetService<GameLogicService>();
             _sceneLoaderService = data.ServiceProvider.GetService<SceneLoaderService>();
+            _soundsPlayerService = data.ServiceProvider.GetService<SoundsPlayerService>();
             
             _gameLogicService.StartGame(data.GameLevelSettings);
             
@@ -31,7 +33,11 @@ namespace View
                 for (int row = 0; row < data.GameLevelSettings.RowsNumber; ++row)
                 {
                     var cardView = Instantiate(_cardViewPrefab, _cardsViewContainer);
-                    cardView.Initialize(_gameLogicService.GetCard(col, row));
+                    cardView.Initialize(new CardView.CardViewData
+                    {
+                        Card = _gameLogicService.GetCard(col, row),
+                        ServiceProvider = _serviceProvider,
+                    });
                 }
             }
             _cardViewPrefab.gameObject.SetActive(false);
@@ -60,7 +66,7 @@ namespace View
                 var cardView1 = _touchedCardQueue.Dequeue();
                 var cardView2 = _touchedCardQueue.Dequeue();
 
-                if (cardView1.Data.Symbol == cardView2.Data.Symbol)
+                if (cardView1.Data.Card.Symbol == cardView2.Data.Card.Symbol)
                     OnMatch(cardView1, cardView2);
                 else
                     OnMissMatch(cardView1, cardView2);
@@ -70,23 +76,33 @@ namespace View
         private void OnMatch(CardView cardView1, CardView cardView2)
         {
             Debug.Log("On Match");
+            
             cardView1.OnMatch();
             cardView2.OnMatch();
-
+            
             if (_gameLogicService.IsFinished)
             {
+                _soundsPlayerService.PlayOneShot("GameOver");
+                
                 _sceneLoaderService.Launch(new SceneLoaderService.MenuSceneLaunchOptions
                 {
                     ServiceProvider = _serviceProvider,
                 });
+            }
+            else
+            {
+                _soundsPlayerService.PlayOneShot("Match");
             }
         }
 
         private void OnMissMatch(CardView cardView1, CardView cardView2)
         {
             Debug.Log("On MissMatch");
+            
             cardView1.OnMissMatch();
             cardView2.OnMissMatch();
+            
+            _soundsPlayerService.PlayOneShot("Miss");
         }
     }
 }

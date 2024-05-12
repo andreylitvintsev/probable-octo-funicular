@@ -10,8 +10,14 @@ using UnityEngine.UI;
 
 namespace View
 {
-    public class CardView : AbstractView<GameLogicService.Card>
+    public class CardView : AbstractView<CardView.CardViewData>
     {
+        public struct CardViewData
+        {
+            public GameLogicService.Card Card;
+            public ServiceProvider ServiceProvider;
+        }
+        
         [SerializeField] private TMP_Text _flipText = null;
         [SerializeField] private Button _button = null;
         [SerializeField] private GameLevelView _gameLevelView = null;
@@ -20,6 +26,8 @@ namespace View
         [SerializeField] private PlayableAsset _cardFlipToBackTimeline = null;
         [SerializeField] private PlayableAsset _cardFlipToFrontTimeline = null;
 
+        private SoundsPlayerService _soundsPlayerService = null;
+
         public bool IsAnimated => _playableDirector.playableAsset != null &&
                                   _playableDirector.state == PlayState.Playing &&
                                   _playableDirector.duration > _playableDirector.time;
@@ -27,24 +35,31 @@ namespace View
         private bool _isFlipped = false;
         public bool IsFlipped => _isFlipped;
         
-        protected override void OnInitialize(GameLogicService.Card data)
+        protected override void OnInitialize(CardView.CardViewData data)
         {
+            _soundsPlayerService = data.ServiceProvider.GetService<SoundsPlayerService>();
+            
             SetInitialVisualState();
-            _button.SubscribeOnClick(() =>
-            {
-                if (IsAnimated || _isFlipped)
-                    return;
-                PlayFlipToFrontAnimation();
-                _gameLevelView.OnCardViewTouched(this);
-                StartCoroutine(WaitAnimationFinish(() =>
-                {
-                    _isFlipped = !_isFlipped;
-                    _gameLevelView.OnCheckMatch();
-                }));
-            }).DisposeWith(this);
+            _button.SubscribeOnClick(OnClick).DisposeWith(this);
         }
 
         protected override void OnDeinitialize() {}
+
+        private void OnClick()
+        {
+            if (IsAnimated || _isFlipped)
+                return;
+            
+            _soundsPlayerService.PlayOneShot("CardFlip");
+            
+            PlayFlipToFrontAnimation();
+            _gameLevelView.OnCardViewTouched(this);
+            StartCoroutine(WaitAnimationFinish(() =>
+            {
+                _isFlipped = !_isFlipped;
+                _gameLevelView.OnCheckMatch();
+            }));
+        }
 
         private void SetInitialVisualState()
         {
@@ -52,7 +67,7 @@ namespace View
             _playableDirector.time = 0;
             _playableDirector.Evaluate();
             
-            _flipText.text = Data.Symbol.ToString(NumberFormatInfo.InvariantInfo);
+            _flipText.text = Data.Card.Symbol.ToString(NumberFormatInfo.InvariantInfo);
         }
         
         private void PlayFlipToBackAnimation()
@@ -75,7 +90,7 @@ namespace View
         
         public void OnMatch()
         {
-            Data.MarkAsMatched();
+            Data.Card.MarkAsMatched();
         }
 
         public void OnMissMatch()
