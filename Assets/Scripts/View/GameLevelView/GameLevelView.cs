@@ -43,11 +43,31 @@ namespace View
             }
             _cardViewPrefab.gameObject.SetActive(false);
             
-            _gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            _gridLayout.constraintCount = _gameLogicService.ColumnsNumber;
+            SetGridSize();
         }
 
         protected override void OnDeinitialize() {}
+
+        private void SetGridSize()
+        {
+            _gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            _gridLayout.constraintCount = _gameLogicService.ColumnsNumber;
+
+            var initialFieldSizeX = _gridLayout.cellSize.x * _gameLogicService.ColumnsNumber +
+                                    _gridLayout.spacing.x * (_gameLogicService.ColumnsNumber + 2);
+            var initialFieldSizeY = _gridLayout.cellSize.y * _gameLogicService.RowsNumber +
+                                    _gridLayout.spacing.y * (_gameLogicService.RowsNumber + 2);
+
+            var canvasRect = GetComponentInParent<Canvas>().GetComponent<RectTransform>().rect;
+            var xScale = initialFieldSizeX / canvasRect.width;
+            var yScale = initialFieldSizeY / canvasRect.height;
+
+            if (xScale > 0.0f || yScale > 0.0f)
+            {
+                _gridLayout.cellSize /= Mathf.Max(xScale, yScale);
+                _gridLayout.spacing /= Mathf.Max(xScale, yScale);
+            }
+        }
         
         public void OnCardViewTouched(CardView cardView)
         {

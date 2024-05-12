@@ -252,6 +252,9 @@ MonoBehaviour:
   - Name: 3x2
     ColumnsNumber: 3
     RowsNumber: 2
+  - Name: 5x6
+    ColumnsNumber: 5
+    RowsNumber: 6
 --- !u!4 &784336655
 Transform:
   m_ObjectHideFlags: 0
