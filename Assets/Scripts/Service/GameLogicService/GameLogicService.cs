@@ -38,7 +38,19 @@ namespace Service
         private readonly ReactiveProperty<int> _turns = new();
         public IReadOnlyReactiveProperty<int> Turns => _turns;
 
-        public override void Initialize() {}
+        public string Name => _gameLevelSettings.Value.Name;
+        public int ColumnsNumber => _gameLevelSettings.Value.ColumnsNumber;
+        public int RowsNumber => _gameLevelSettings.Value.RowsNumber;
+        
+        public bool HasPersistedState => GameLogicServicePersistenceHelper.HasPersistedState();
+
+        protected override void OnInitialize() {}
+
+        protected override void OnDeinitialize()
+        {
+            if (!IsFinished)
+                GameLogicServicePersistenceHelper.Persist(this);
+        }
 
         private static void Shuffle(Card[] array)
         {
@@ -66,11 +78,36 @@ namespace Service
             Shuffle(_cards);
         }
 
+        public bool TryStartGameFromPersistence()
+        {
+            var persistedGameState = GameLogicServicePersistenceHelper.Load();
+            if (persistedGameState == null)
+                return false;
+
+            _gameLevelSettings = new GameLevelsService.GameLevelSettings
+            {
+                Name = persistedGameState.Value.Name,
+                ColumnsNumber = persistedGameState.Value.ColumnsNumber,
+                RowsNumber = persistedGameState.Value.RowsNumber,
+            };
+            _cards = persistedGameState.Value.Cards.Select((persistedCard) =>
+            {
+                var card = new Card(this, persistedCard.Symbol);
+                if (persistedCard.IsMatched)
+                    card.MarkAsMatched();
+                return card;
+            }).ToArray();
+            _turns.Value = persistedGameState.Value.TurnsNumber;
+            
+            return true;
+        }
+
         public void FinishGame()
         {
             _gameLevelSettings = null;
             _cards = null;
             _turns.Value = 0;
+            GameLogicServicePersistenceHelper.Clear();
         }
         
         public Card GetCard(int col, int row)

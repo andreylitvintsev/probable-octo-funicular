@@ -246,12 +246,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _levelSettings:
-  - <Name>k__BackingField: 2x2
-    <ColumnsNumber>k__BackingField: 2
-    <RowsNumber>k__BackingField: 2
-  - <Name>k__BackingField: 3x2
-    <ColumnsNumber>k__BackingField: 3
-    <RowsNumber>k__BackingField: 2
+  - Name: 2x2
+    ColumnsNumber: 2
+    RowsNumber: 2
+  - Name: 3x2
+    ColumnsNumber: 3
+    RowsNumber: 2
 --- !u!4 &784336655
 Transform:
   m_ObjectHideFlags: 0

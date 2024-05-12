@@ -63,7 +63,9 @@ namespace View
 
         private void SetInitialVisualState()
         {
-            _playableDirector.playableAsset = _cardFlipToFrontTimeline;
+            _isFlipped = Data.Card.IsMatched;
+            
+            _playableDirector.playableAsset = Data.Card.IsMatched ? _cardFlipToBackTimeline : _cardFlipToFrontTimeline;
             _playableDirector.time = 0;
             _playableDirector.Evaluate();
             

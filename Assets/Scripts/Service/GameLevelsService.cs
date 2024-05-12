@@ -9,14 +9,15 @@ namespace Service
         [Serializable]
         public struct GameLevelSettings
         {
-            [field: SerializeField] public string Name { get; private set; }
-            [field: SerializeField, Min(2)] public int ColumnsNumber { get; private set; }
-            [field: SerializeField, Min(2)] public int RowsNumber { get; private set; }
+            [SerializeField] public string Name;
+            [SerializeField, Min(2)] public int ColumnsNumber;
+            [SerializeField, Min(2)] public int RowsNumber;
         }
         
         [SerializeField] private List<GameLevelSettings> _levelSettings = null;
         public IReadOnlyList<GameLevelSettings> LevelSettings => _levelSettings;
 
-        public override void Initialize() {}
+        protected override void OnInitialize() {}
+        protected override void OnDeinitialize() {}
     }
 }

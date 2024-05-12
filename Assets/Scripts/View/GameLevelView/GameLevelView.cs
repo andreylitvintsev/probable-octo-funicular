@@ -26,11 +26,12 @@ namespace View
             _sceneLoaderService = data.ServiceProvider.GetService<SceneLoaderService>();
             _soundsPlayerService = data.ServiceProvider.GetService<SoundsPlayerService>();
             
-            _gameLogicService.StartGame(data.GameLevelSettings);
+            if (!_gameLogicService.TryStartGameFromPersistence())
+                _gameLogicService.StartGame(data.GameLevelSettings.Value);
             
-            for (int col = 0; col < data.GameLevelSettings.ColumnsNumber; ++col)
+            for (int col = 0; col < _gameLogicService.ColumnsNumber; ++col)
             {
-                for (int row = 0; row < data.GameLevelSettings.RowsNumber; ++row)
+                for (int row = 0; row < _gameLogicService.RowsNumber; ++row)
                 {
                     var cardView = Instantiate(_cardViewPrefab, _cardsViewContainer);
                     cardView.Initialize(new CardView.CardViewData
@@ -43,13 +44,10 @@ namespace View
             _cardViewPrefab.gameObject.SetActive(false);
             
             _gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            _gridLayout.constraintCount = data.GameLevelSettings.ColumnsNumber;
+            _gridLayout.constraintCount = _gameLogicService.ColumnsNumber;
         }
 
-        protected override void OnDeinitialize()
-        {
-            _gameLogicService.FinishGame();
-        }
+        protected override void OnDeinitialize() {}
         
         public void OnCardViewTouched(CardView cardView)
         {
@@ -90,6 +88,7 @@ namespace View
                 {
                     ServiceProvider = _serviceProvider,
                 });
+                _gameLogicService.FinishGame();
             }
             else
             {

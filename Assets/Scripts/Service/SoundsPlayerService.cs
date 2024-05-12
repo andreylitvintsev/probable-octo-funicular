@@ -16,15 +16,16 @@ namespace Service
         [SerializeField] private List<AudioClipSettings> _settingsList = null;
         [SerializeField] private AudioSource _audioSource = null;
         private Dictionary<string, AudioClipSettings> _settingsLookup = new();
-        
-        
-        public override void Initialize()
+
+        protected override void OnInitialize()
         {
             foreach (var settings in _settingsList)
             {
                 _settingsLookup[settings.Id] = settings;
             }
         }
+
+        protected override void OnDeinitialize() {}
 
         public void PlayOneShot(string soundId)
         {

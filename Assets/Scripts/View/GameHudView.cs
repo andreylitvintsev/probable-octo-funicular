@@ -31,6 +31,7 @@ namespace View
 
         private void OnBackButtonClick()
         {
+            _gameLogicService.FinishGame();
             _sceneLoaderService.Launch(new SceneLoaderService.MenuSceneLaunchOptions
             {
                 ServiceProvider = Data.ServiceProvider,

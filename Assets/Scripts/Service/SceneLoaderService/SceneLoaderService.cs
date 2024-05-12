@@ -15,11 +15,13 @@ namespace Service
         public struct GameSceneLaunchOptions
         {
             public ServiceProvider ServiceProvider;
-            public GameLevelsService.GameLevelSettings GameLevelSettings;
+            public GameLevelsService.GameLevelSettings? GameLevelSettings;
         }
 
-        public override void Initialize() {}
-        
+        protected override void OnInitialize() {}
+
+        protected override void OnDeinitialize() {}
+
         public void Launch(MenuSceneLaunchOptions launchOptions, Action<MenuSceneEntrypoint> onLaunchedScene = null)
         {
             LoadScene<MenuSceneEntrypoint>("MenuScene", bootstrap =>
