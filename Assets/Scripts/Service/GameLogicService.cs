@@ -1,4 +1,5 @@
 using System.Linq;
+using ReactiveProperty;
 using Random = UnityEngine.Random;
 
 namespace Service
@@ -34,6 +35,9 @@ namespace Service
                                   _cards == null ||
                                   _cards.All(card => card.IsMatched);
 
+        private readonly ReactiveProperty<int> _turns = new();
+        public IReadOnlyReactiveProperty<int> Turns => _turns;
+
         public override void Initialize() {}
 
         private static void Shuffle(Card[] array)
@@ -66,6 +70,7 @@ namespace Service
         {
             _gameLevelSettings = null;
             _cards = null;
+            _turns.Value = 0;
         }
         
         public Card GetCard(int col, int row)
@@ -73,6 +78,16 @@ namespace Service
             if (!_gameLevelSettings.HasValue)
                 return null;
             return _cards[_gameLevelSettings.Value.ColumnsNumber * row + col];
+        }
+
+        public void OnMatch()
+        {
+            _turns.Value += 1;
+        }
+
+        public void OnMissMatch()
+        {
+            _turns.Value += 1;
         }
     }
 }

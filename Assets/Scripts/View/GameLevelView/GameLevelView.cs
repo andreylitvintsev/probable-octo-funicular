@@ -80,6 +80,8 @@ namespace View
             cardView1.OnMatch();
             cardView2.OnMatch();
             
+            _gameLogicService.OnMatch();
+            
             if (_gameLogicService.IsFinished)
             {
                 _soundsPlayerService.PlayOneShot("GameOver");
@@ -101,6 +103,8 @@ namespace View
             
             cardView1.OnMissMatch();
             cardView2.OnMissMatch();
+            
+            _gameLogicService.OnMissMatch();
             
             _soundsPlayerService.PlayOneShot("Miss");
         }
